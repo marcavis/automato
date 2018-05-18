@@ -135,9 +135,6 @@ public class Automato {
 			//estados complexos podem ser: estado 4, com [1,3] dentro de estadosComplexos
 			finais.add(false);
 		}
-//		for (int[] c : estadosComplexos) {
-//			System.out.println(c[0]);
-//		}
 	}
 
 	public void adicionaRegra(RegraDeProducao regraDeProducao) {
@@ -206,44 +203,62 @@ public class Automato {
 			System.out.println("Autômato já é determinístico");
 			return;
 		}
-		int iteracao = 0;
-		while (iteracao < 1) {
-			for (int i = 0; i < getRegras().size() - 1; i++) {
-				ArrayList<Integer> destinos = new ArrayList<Integer>();
-				for (int j = i + 1; j < getRegras().size(); j++) {
-					int destino1 = getRegras().get(i).getEstadoFim();
-					int destino2 = getRegras().get(j).getEstadoFim();
-					if (getRegras().get(i).getEstadoOrigem() == getRegras().get(j).getEstadoOrigem() &&
-							getRegras().get(i).getSimbolo() == getRegras().get(j).getSimbolo()) {
-						System.out.println(getRegras().get(i));
-						System.out.println(getRegras().get(j));
-						//System.out.println(getEstadosComplexos().get(destino1).length + " " + getEstadosComplexos().get(destino2).length);
-						if(destinos.size() == 0) {
-							destinos.add(destino1);
-						}
-						destinos.add(destino2);
-						
-					}			
+		
+		int indice = 0;
+		while (indice < getEstados().size()) {
+			//existem estados depois desse se ainda faltam alguns a serem percorridos, ou se acabamos de criar um novo
+			int esteEstado = getEstados().get(indice);
+			for (int iSimb = 0; iSimb < getAlfabeto().size(); iSimb++) {
+				boolean[] destinos = new boolean[getEstados().size()];
+				for (int i = 0; i <  destinos.length; i++) {
+					destinos[i] = false;
 				}
-				//neste ponto é que se deve criar estados novos, com todos os destinos encontrados
-				System.out.println(destinos);
-				if (destinos.size() > 0) {
-					Collections.sort(destinos);
-					int[] vetorDestinos = new int[destinos.size()];
-					for (int k = 0; k < destinos.size(); k++) {
-						vetorDestinos[k] = destinos.get(k);
+				for (int iRegra = 0; iRegra < getRegras().size(); iRegra++) {
+					RegraDeProducao estaRegra = getRegras().get(iRegra);
+					if (estaRegra.getEstadoOrigem() == esteEstado && estaRegra.getSimbolo() == getAlfabeto().get(iSimb)) {
+						destinos[estaRegra.getEstadoFim()] = true;
 					}
-					if (!existeEstado(this.getEstados().size(), vetorDestinos)) {
-						adicionarEstadoComplexo(this.getEstados().size(), vetorDestinos);
+					
+				}
+				int qtEstadosComponentes = 0;
+				for (boolean b : destinos) {
+					if (b) {
+						qtEstadosComponentes++;
 					}
 				}
+				int[] componentes = new int[qtEstadosComponentes];
+				int indiceDestino = 0;
+				for (int i = 0; i < destinos.length; i++) {
+					if (destinos[i]) {
+						componentes[indiceDestino] = i;
+						indiceDestino++;
+					}
+				}
+//				for (boolean i : destinos) {
+//					System.out.println(i);
+//				}
+//				System.out.println("h" + indiceDestino);
+				if (indiceDestino > 1) {
+					String saida = "";
+					for (int i : componentes) {
+						saida += i + ",";
+					}
+					System.out.println(saida);
+					//criar um novo estado, a não ser que já exista
+					if (!existeEstado(getEstados().size(), componentes)) {
+						adicionarEstadoComplexo(getEstados().size(), componentes);
+					}
+					
+				}
 			}
-			System.out.println(this);
-			for (RegraDeProducao r : regras) {
-				System.out.println(r);
-			}
-			iteracao++;
+			indice++;
 		}
+		
+		System.out.println(this);
+		for (RegraDeProducao r : regras) {
+			System.out.println(r);
+		}
+		
 	}
 	
 	public String mostraLista(int[] lista) {
@@ -330,14 +345,29 @@ public class Automato {
 		for (int e : getEstados()) {
 			delta += "\n" + String.format("%16s", representar(e)) + " |";
 			for (char s : getAlfabeto()) {
-				ArrayList<Integer> estaCelula = new ArrayList<Integer>();
-				for (int f: getEstadosComplexos().get(e)) {
-					
-					for (RegraDeProducao regra : getRegras()) {
-						if (regra.getEstadoOrigem() == f && regra.getSimbolo() == s)
-							estaCelula.add(regra.getEstadoFim());
+				boolean[] destinos = new boolean[getEstados().size()];
+				for (int i = 0; i <  destinos.length; i++) {
+					destinos[i] = false;
+				}
+				for (int iRegra = 0; iRegra < getRegras().size(); iRegra++) {
+					RegraDeProducao estaRegra = getRegras().get(iRegra);
+					if (estaRegra.getEstadoOrigem() == e && estaRegra.getSimbolo() == s) {
+						destinos[estaRegra.getEstadoFim()] = true;
 					}
 				}
+				ArrayList<Integer> estaCelula = new ArrayList<Integer>();
+				for (int i = 0; i < destinos.length; i++) {
+					if (destinos[i]) {
+						estaCelula.add(i);
+					}
+				}
+//				for (int f: getEstadosComplexos().get(e)) {
+//					
+//					for (RegraDeProducao regra : getRegras()) {
+//						if (regra.getEstadoOrigem() == f && regra.getSimbolo() == s)
+//							estaCelula.add(regra.getEstadoFim());
+//					}
+//				}
 				if (estaCelula.size() == 0)
 					estaCelula.add(-1); //representa λ, ausência de estado válido
 				delta += centralizar(18, estaCelula) + "|";

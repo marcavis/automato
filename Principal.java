@@ -32,6 +32,7 @@ public class Principal {
 		}
 		exemplo.setEstadoInicial(exemplo.getEstados().get(0));
 		//exemplo.executar("0011");
+		System.out.println(exemplo);
 		exemplo.determinizar();
 	}
 
