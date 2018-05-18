@@ -18,22 +18,21 @@ public class Principal {
 		exemplo.criaEstadosIniciais(4);
 		//ArrayList<RegraDeProducao> regras = new ArrayList<RegraDeProducao>();
 		try {
-			exemplo.adicionaRegra(0,1,'0');
-			exemplo.adicionaRegra(0,1,'1');
-			exemplo.adicionaRegra(1,2,'0');
-			exemplo.adicionaRegra(1,2,'1');
+			exemplo.adicionaRegra(0,2,'0');
+			exemplo.adicionaRegra(0,0,'1');
+			exemplo.adicionaRegra(1,0,'1');
+			exemplo.adicionaRegra(1,3,'1');
+			exemplo.adicionaRegra(2,1,'0');
 			exemplo.adicionaRegra(2,3,'0');
-			exemplo.adicionaRegra(2,3,'1');
-			exemplo.adicionaRegra(2,1,'1');
-			exemplo.setFinal(1, true);
-			exemplo.setFinal(2, true);
+			exemplo.adicionaRegra(3,1,'0');
+			exemplo.adicionaRegra(3,2,'1');
 			exemplo.setFinal(3, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		exemplo.setEstadoInicial(exemplo.getEstados().get(0));
-		exemplo.executar("0011");
-		System.out.println(exemplo.tipoDeAutomato());
+		//exemplo.executar("0011");
+		exemplo.determinizar();
 	}
 
 }

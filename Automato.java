@@ -5,6 +5,7 @@ import java.util.Collections;
 
 public class Automato {
 	private ArrayList<Integer> estados;
+	private ArrayList<int[]> estadosComplexos;
 	private ArrayList<Boolean> finais;
 	private ArrayList<Character> alfabeto;
 	private ArrayList<RegraDeProducao> regras;
@@ -13,6 +14,7 @@ public class Automato {
 	
 	public Automato() {
 		this.estados = new ArrayList<Integer>();
+		this.estadosComplexos = new ArrayList<int[]>();
 		this.finais = new ArrayList<Boolean>();
 		for (int i = 0; i < estados.size(); i++) {
 			finais.add(false);
@@ -24,6 +26,7 @@ public class Automato {
 	
 	public Automato(ArrayList<Integer> estados, ArrayList<Character> alfabeto, ArrayList<RegraDeProducao> regras, int estadoInicial) {
 		this.estados = estados;
+		this.estadosComplexos = new ArrayList<int[]>();
 		this.finais = new ArrayList<Boolean>();
 		for (int i = 0; i < estados.size(); i++) {
 			finais.add(false);
@@ -39,6 +42,53 @@ public class Automato {
 	
 	public void setEstados(ArrayList<Integer> estados) {
 		this.estados = estados;
+	}
+	
+	public ArrayList<int[]> getEstadosComplexos() {
+		return estadosComplexos;
+	}
+	
+	public void setEstadosComplexos(ArrayList<int[]> estadosComplexos) {
+		this.estadosComplexos = estadosComplexos;
+	}
+	
+	public void adicionarEstado(int e) {
+		estados.add(e);
+		finais.add(false);
+		estadosComplexos.add(new int[]{e});
+	}
+	
+	public void adicionarEstadoComplexo(int e, int[] componentes) {
+		String r = "" + e +",";
+		for (int i : componentes) {
+			r+=i + ",";
+		}
+		//System.out.println(r);
+		estados.add(e);
+		finais.add(false);
+		for (int componente : componentes) {
+			if (getFinais().get(componente)) {
+				finais.set(e, true);
+				//se algum dos componentes for estado final, este estado complexo será também
+			}
+		}
+		estadosComplexos.add(componentes);
+		ArrayList<RegraDeProducao> novasRegras = new ArrayList<RegraDeProducao>();
+		for (int componente : componentes) {
+			for (RegraDeProducao regra : getRegras()) {
+				if (regra.getEstadoOrigem() == componente) {
+					try {
+						novasRegras.add(new RegraDeProducao(e, regra.getEstadoFim(), regra.getSimbolo()));
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
+		for (RegraDeProducao novaRegra : novasRegras) {
+			regras.add(novaRegra);
+		}
 	}
 	
 	public ArrayList<Boolean> getFinais() {
@@ -81,8 +131,13 @@ public class Automato {
 		this.estados = new ArrayList<Integer>();
 		for (int i = 0; i < quantidade; i++) {
 			estados.add(i);
+			estadosComplexos.add(new int[]{i}); //recebe um array com apenas o número do estado dentro - estado 0 tem [0] 
+			//estados complexos podem ser: estado 4, com [1,3] dentro de estadosComplexos
 			finais.add(false);
 		}
+//		for (int[] c : estadosComplexos) {
+//			System.out.println(c[0]);
+//		}
 	}
 
 	public void adicionaRegra(RegraDeProducao regraDeProducao) {
@@ -135,8 +190,6 @@ public class Automato {
 			}
 		}
 		
-		//trocar para getFinal()
-		System.out.println(getFinais());
 		if (!falha && getFinais().get(estado))
 			System.out.println(cadeia + " é uma cadeia reconhecida");
 		else
@@ -145,6 +198,102 @@ public class Automato {
 	
 	public ArrayList<Boolean> getEstadosFinais() {
 		return finais;
+	}
+	
+	//complexo demais
+	public void determinizar() {
+		if (ehDeterministico()) {
+			System.out.println("Autômato já é determinístico");
+			return;
+		}
+		int iteracao = 0;
+		while (iteracao < 1) {
+			for (int i = 0; i < getRegras().size() - 1; i++) {
+				ArrayList<Integer> destinos = new ArrayList<Integer>();
+				for (int j = i + 1; j < getRegras().size(); j++) {
+					int destino1 = getRegras().get(i).getEstadoFim();
+					int destino2 = getRegras().get(j).getEstadoFim();
+					if (getRegras().get(i).getEstadoOrigem() == getRegras().get(j).getEstadoOrigem() &&
+							getRegras().get(i).getSimbolo() == getRegras().get(j).getSimbolo()) {
+						System.out.println(getRegras().get(i));
+						System.out.println(getRegras().get(j));
+						//System.out.println(getEstadosComplexos().get(destino1).length + " " + getEstadosComplexos().get(destino2).length);
+						if(destinos.size() == 0) {
+							destinos.add(destino1);
+						}
+						destinos.add(destino2);
+						
+					}			
+				}
+				//neste ponto é que se deve criar estados novos, com todos os destinos encontrados
+				System.out.println(destinos);
+				if (destinos.size() > 0) {
+					Collections.sort(destinos);
+					int[] vetorDestinos = new int[destinos.size()];
+					for (int k = 0; k < destinos.size(); k++) {
+						vetorDestinos[k] = destinos.get(k);
+					}
+					if (!existeEstado(this.getEstados().size(), vetorDestinos)) {
+						adicionarEstadoComplexo(this.getEstados().size(), vetorDestinos);
+					}
+				}
+			}
+			System.out.println(this);
+			for (RegraDeProducao r : regras) {
+				System.out.println(r);
+			}
+			iteracao++;
+		}
+	}
+	
+	public String mostraLista(int[] lista) {
+		String saida = "(";
+		for (int i : lista) {
+			saida += i + ",";
+		}
+		return saida + ")";
+	}
+	
+	public boolean existeEstado(int estado, int[] componentes) {
+		//System.out.println(estado + "x" + mostraLista(componentes));
+		for(int e = 0; e < getEstados().size(); e++) {
+			int componentesIguais = 0;
+			for(int f = 0; f < getEstadosComplexos().get(e).length; f++) {
+				for(int g = 0; g < componentes.length; g++) {
+					if (componentes[g] == getEstadosComplexos().get(e)[f]) {
+						componentesIguais++;
+					}
+				}
+			}
+			if (componentesIguais == componentes.length) {
+				return true;
+			}
+		}
+		return false;	
+	}
+	
+	public int[] uniao(int[] a, int[] b) {
+		int[] resultado = new int[a.length + b.length];
+		int contador = 0;
+		boolean[] contidoEmA = new boolean[getEstados().size()];
+		boolean[] contidoEmB = new boolean[getEstados().size()];
+		for (int i = 0; i < getEstados().size(); i++) {
+			for (int j = 0; j < a.length; j++) {
+				if (a[j] == i) {
+					contidoEmA[i] = true;
+				}
+			}
+			for (int j = 0; j < b.length; j++) {
+				if (b[j] == i) {
+					contidoEmB[i] = true;
+				}
+			}
+			if (contidoEmA[i] || contidoEmB[i]) {
+				resultado[contador] = i;
+				contador++;
+			}
+		}
+		return resultado;
 	}
 	
 	@Override
@@ -173,25 +322,38 @@ public class Automato {
 			listaFinais = "{}";
 		}
 			
-		String saida = "L = {{" + stringEstados + "}, {" + stringSimbolos + "}, δ, " + getEstadoInicial() + ", {" + listaFinais + "}}";
-		String delta = "δ      |";
+		String saida = "L = {{" + stringEstados + "}, {" + stringSimbolos + "}, δ, q" + getEstadoInicial() + ", {" + listaFinais + "}}";
+		String delta = "               δ |";
 		for (char simbolo : getAlfabeto()) {
-			delta += "      " + simbolo + "      |";
+			delta += "        " + simbolo + "         |";
 		}
 		for (int e : getEstados()) {
-			delta += "\n" + String.format("%6s", "q" + e + (getFinais().get(e) ? "*":"")) + " |";
+			delta += "\n" + String.format("%16s", representar(e)) + " |";
 			for (char s : getAlfabeto()) {
 				ArrayList<Integer> estaCelula = new ArrayList<Integer>();
-				for (RegraDeProducao regra : getRegras()) {
-					if (regra.getEstadoOrigem() == e && regra.getSimbolo() == s)
-						estaCelula.add(regra.getEstadoFim());
+				for (int f: getEstadosComplexos().get(e)) {
+					
+					for (RegraDeProducao regra : getRegras()) {
+						if (regra.getEstadoOrigem() == f && regra.getSimbolo() == s)
+							estaCelula.add(regra.getEstadoFim());
+					}
 				}
 				if (estaCelula.size() == 0)
 					estaCelula.add(-1); //representa λ, ausência de estado válido
-				delta += centralizar(13, estaCelula) + "|";
+				delta += centralizar(18, estaCelula) + "|";
 			}
+			delta += " (q" + e + ")";
 		}
+		
 		return saida + "\n" + delta + "\n";
+	}
+	
+	public String representar(int estado) {
+		String resultado = "";
+		for (int parte : getEstadosComplexos().get(estado)) {
+			resultado += "q" + parte + (getFinais().get(parte) ? "*":"");
+		}
+		return resultado;
 	}
 	
 	public String centralizar(int tamanho, ArrayList<Integer> s) {
@@ -199,7 +361,7 @@ public class Automato {
 		if (s.get(0) == -1) {
 			saida += "λ";
 		} else {
-			Collections.sort(s);;
+			Collections.sort(s);
 			for (int i: s) {
 				saida += "q" + i + (getFinais().get(i) ? "*":"");
 			}
@@ -208,20 +370,19 @@ public class Automato {
 		for (int i = 0; i < (tamanho - saida.length())/2; i++) {
 			espaco += " ";
 		}
-		return espaco + saida + ((tamanho - s.size())%2 == 0 ? "":" ") + espaco;
+		return espaco + saida + ((tamanho - saida.length())%2 == 0 ? "":" ") + espaco;
 	}
 	
-	public String tipoDeAutomato() {
+	public boolean ehDeterministico() {
 		//int[][] controle = new int[estados.size()][estados.size()];
 		for (int i = 0; i < getRegras().size() - 1; i++) {
 			for (int j = i + 1; j < getRegras().size(); j++) {
 				if (getRegras().get(i).getEstadoOrigem() == getRegras().get(j).getEstadoOrigem() &&
 						getRegras().get(i).getSimbolo() == getRegras().get(j).getSimbolo()) {
-					return "AFND";
+					return false;
 				}
-					
 			}
 		}
-		return "AFD";
+		return true;
 	}
 }

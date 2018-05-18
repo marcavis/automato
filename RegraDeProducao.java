@@ -46,7 +46,7 @@ public class RegraDeProducao {
 	
 	@Override
 	public String toString() {
-		return "δ(q" + getEstadoOrigem() + ", q" + getSimbolo() +
+		return "δ(q" + getEstadoOrigem() + ", " + getSimbolo() +
 				") = q" + getEstadoFim();
 	}
 }
