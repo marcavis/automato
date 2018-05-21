@@ -247,9 +247,9 @@ public class Automato {
 		}
 		
 		System.out.println(this);
-		for (RegraDeProducao r : regras) {
-			System.out.println(r);
-		}
+//		for (RegraDeProducao r : regras) {
+//			System.out.println(r);
+//		}
 		
 		//agora que temos os nomes dos novos estados, limpar regras que causam não determinismo
 		for (int i = 0; i < getEstados().size(); i++) {
@@ -276,14 +276,41 @@ public class Automato {
 							regrasARemover.add(getRegras().get(k));
 						}
 					}
+					//coletar quais os estados componentes do estado que iremos adicionar
+					//como destino para o estado i e símbolo j
+					int[] componentesDoEstadoAReadicionar = new int[regrasARemover.size()];
+					for (int k = 0; k < regrasARemover.size(); k++) {
+						componentesDoEstadoAReadicionar[k] = regrasARemover.get(k).getEstadoFim();
+					}
+					
 					//está removendo com sucesso, basta reincluir uma regra que adicione o destino equivalente à união
 					//de destinos que havia antes
 					getRegras().removeAll(regrasARemover);
+					int estadoDestinoDaNovaRegra = encontrarEstadoComplexo(componentesDoEstadoAReadicionar);
+					getRegras().add(new RegraDeProducao(getEstados().get(i), estadoDestinoDaNovaRegra, getAlfabeto().get(j)));
 				}
 			}
 		}
 	}
 	
+	public int encontrarEstadoComplexo(int[] componentes) {
+		//System.out.println(estado + "x" + mostraLista(componentes));
+		for(int e = 0; e < getEstados().size(); e++) {
+			int componentesIguais = 0;
+			for(int f = 0; f < getEstadosComplexos().get(e).length; f++) {
+				for(int g = 0; g < componentes.length; g++) {
+					if (componentes[g] == getEstadosComplexos().get(e)[f]) {
+						componentesIguais++;
+					}
+				}
+			}
+			if (componentesIguais == componentes.length) {
+				return getEstados().get(e);
+			}
+		}
+		return -1;	
+	}
+
 	public String mostraLista(int[] lista) {
 		String saida = "(";
 		for (int i : lista) {
