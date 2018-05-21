@@ -34,6 +34,7 @@ public class Principal {
 		//exemplo.executar("0011");
 		System.out.println(exemplo);
 		exemplo.determinizar();
+		System.out.println(exemplo);
 	}
 
 }

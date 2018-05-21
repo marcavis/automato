@@ -59,11 +59,6 @@ public class Automato {
 	}
 	
 	public void adicionarEstadoComplexo(int e, int[] componentes) {
-		String r = "" + e +",";
-		for (int i : componentes) {
-			r+=i + ",";
-		}
-		//System.out.println(r);
 		estados.add(e);
 		finais.add(false);
 		for (int componente : componentes) {
@@ -234,10 +229,7 @@ public class Automato {
 						indiceDestino++;
 					}
 				}
-//				for (boolean i : destinos) {
-//					System.out.println(i);
-//				}
-//				System.out.println("h" + indiceDestino);
+
 				if (indiceDestino > 1) {
 					String saida = "";
 					for (int i : componentes) {
@@ -259,6 +251,37 @@ public class Automato {
 			System.out.println(r);
 		}
 		
+		//agora que temos os nomes dos novos estados, limpar regras que causam não determinismo
+		for (int i = 0; i < getEstados().size(); i++) {
+			for (int j = 0; j < getAlfabeto().size(); j++) {
+				//remover todas as regras com este estado i de origem e este símbolo j, a não ser que exista apenas 1 (ou 0)
+				boolean[] aRemover = new boolean[getRegras().size()];
+				for (int k = 0; k <  aRemover.length; k++) {
+					aRemover[k] = false;
+				}
+				int qtARemover = 0;
+				for (int k = 0; k < getRegras().size(); k++) {
+					int esteEstado = getEstados().get(i);
+					char esteSimbolo = getAlfabeto().get(j);
+					RegraDeProducao estaRegra = getRegras().get(k);
+					if (estaRegra.getEstadoOrigem() == esteEstado && estaRegra.getSimbolo() == esteSimbolo) {
+						aRemover[k] = true;
+						qtARemover++;
+					}
+				}
+				if (qtARemover > 1) {
+					ArrayList<RegraDeProducao> regrasARemover = new ArrayList<RegraDeProducao>();
+					for (int k = 0; k < getRegras().size(); k++) {
+						if (aRemover[k]) {
+							regrasARemover.add(getRegras().get(k));
+						}
+					}
+					//está removendo com sucesso, basta reincluir uma regra que adicione o destino equivalente à união
+					//de destinos que havia antes
+					getRegras().removeAll(regrasARemover);
+				}
+			}
+		}
 	}
 	
 	public String mostraLista(int[] lista) {
