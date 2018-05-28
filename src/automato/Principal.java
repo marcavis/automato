@@ -6,8 +6,19 @@ public class Principal {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		
+		//rodaExemplo1();
+		rodaExemplo2();
+	}
+	
+	public static void rodaExemplo2() {
+		//começando um teste do automato que precisaremos
 		Automato exemplo = new Automato();
 		
+	}
+	
+	public static void rodaExemplo1() {
+		Automato exemplo = new Automato();
 		ArrayList<Character> simbolos = new ArrayList<Character>();
 		
 		simbolos.add('0');
