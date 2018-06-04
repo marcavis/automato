@@ -1,23 +1,23 @@
 package automato;
 
-public class RegraDeProducao {
+public class RegraDeProducao<T> {
 	private int estadoOrigem;
 	private int estadoFim;
-	private char simbolo;
+	private T simbolo;
 	
 	public RegraDeProducao() {
 	}
 	
-	public RegraDeProducao(int estadoOrigem, int estadoFim, char simbolo) {
+	public RegraDeProducao(int estadoOrigem, int estadoFim, T simbolo) {
 		this.estadoOrigem = estadoOrigem;
 		this.estadoFim = estadoFim;
 		this.simbolo = simbolo;
 	}
 	
-	public boolean equals(RegraDeProducao regra) {
+	public boolean equals(RegraDeProducao<T> regra) {
 		return regra.getEstadoOrigem() == estadoOrigem &&
 				regra.getEstadoFim() == estadoFim &&
-				regra.getSimbolo() == simbolo;
+				regra.getSimbolo().equals(simbolo);
 	}
 
 	public int getEstadoOrigem() {
@@ -36,11 +36,11 @@ public class RegraDeProducao {
 		this.estadoFim = estadoFim;
 	}
 	
-	public char getSimbolo() {
+	public T getSimbolo() {
 		return simbolo;
 	}
 	
-	public void setSimbolo(char simbolo) {
+	public void setSimbolo(T simbolo) {
 		this.simbolo = simbolo;
 	}
 	

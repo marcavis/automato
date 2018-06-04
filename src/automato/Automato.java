@@ -3,12 +3,12 @@ package automato;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Automato {
+public class Automato<T> {
 	private ArrayList<Integer> estados;
 	private ArrayList<int[]> estadosComplexos;
 	private ArrayList<Boolean> finais;
-	private ArrayList<Character> alfabeto;
-	private ArrayList<RegraDeProducao> regras;
+	private ArrayList<T> alfabeto;
+	private ArrayList<RegraDeProducao<T>> regras;
 	
 	private int estadoInicial;
 	
@@ -19,12 +19,12 @@ public class Automato {
 		for (int i = 0; i < estados.size(); i++) {
 			finais.add(false);
 		}
-		this.alfabeto = new ArrayList<Character>();
-		this.regras = new ArrayList<RegraDeProducao>();
+		this.alfabeto = new ArrayList<T>();
+		this.regras = new ArrayList<RegraDeProducao<T>>();
 		this.estadoInicial = -1;
 	}
 	
-	public Automato(ArrayList<Integer> estados, ArrayList<Character> alfabeto, ArrayList<RegraDeProducao> regras, int estadoInicial) {
+	public Automato(ArrayList<Integer> estados, ArrayList<T> alfabeto, ArrayList<RegraDeProducao<T>> regras, int estadoInicial) {
 		this.estados = estados;
 		this.estadosComplexos = new ArrayList<int[]>();
 		this.finais = new ArrayList<Boolean>();
@@ -68,12 +68,12 @@ public class Automato {
 			}
 		}
 		estadosComplexos.add(componentes);
-		ArrayList<RegraDeProducao> novasRegras = new ArrayList<RegraDeProducao>();
+		ArrayList<RegraDeProducao<T>> novasRegras = new ArrayList<RegraDeProducao<T>>();
 		for (int componente : componentes) {
-			for (RegraDeProducao regra : getRegras()) {
+			for (RegraDeProducao<T> regra : getRegras()) {
 				if (regra.getEstadoOrigem() == componente) {
 					try {
-						novasRegras.add(new RegraDeProducao(e, regra.getEstadoFim(), regra.getSimbolo()));
+						novasRegras.add(new RegraDeProducao<T>(e, regra.getEstadoFim(), regra.getSimbolo()));
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -81,7 +81,7 @@ public class Automato {
 				}
 			}
 		}
-		for (RegraDeProducao novaRegra : novasRegras) {
+		for (RegraDeProducao<T> novaRegra : novasRegras) {
 			regras.add(novaRegra);
 		}
 	}
@@ -94,19 +94,19 @@ public class Automato {
 		this.finais = finais;
 	}
 
-	public ArrayList<Character> getAlfabeto() {
+	public ArrayList<T> getAlfabeto() {
 		return alfabeto;
 	}
 	
-	public void setAlfabeto(ArrayList<Character> alfabeto) {
+	public void setAlfabeto(ArrayList<T> alfabeto) {
 		this.alfabeto = alfabeto;
 	}
 	
-	public ArrayList<RegraDeProducao> getRegras() {
+	public ArrayList<RegraDeProducao<T>> getRegras() {
 		return regras;
 	}
 	
-	public void setRegras(ArrayList<RegraDeProducao> regras) {
+	public void setRegras(ArrayList<RegraDeProducao<T>> regras) {
 		this.regras = regras;
 	}
 	
@@ -132,13 +132,13 @@ public class Automato {
 		}
 	}
 
-	public void adicionaRegra(RegraDeProducao regraDeProducao) {
+	public void adicionaRegra(RegraDeProducao<T> regraDeProducao) {
 		this.regras.add(regraDeProducao);
 	}
 	
-	public void adicionaRegra(int origem, int destino, char conteudo) throws Exception {
+	public void adicionaRegra(int origem, int destino, T conteudo) throws Exception {
 		int estadoDeOrigem = -1, estadoDeDestino = -1;
-		char novoSimbolo = ' ';
+		T novoSimbolo = null;
 		boolean semSimbolo = true;
 		for (int e : this.getEstados()) {
 			if (e == origem)
@@ -146,8 +146,8 @@ public class Automato {
 			if (e == destino)
 				estadoDeDestino = e;
 		}
-		for (char s : alfabeto) {
-			if (s == conteudo) {
+		for (T s : alfabeto) {
+			if (s.equals(conteudo)) {
 				novoSimbolo = s;
 				semSimbolo = false;
 			}
@@ -156,7 +156,7 @@ public class Automato {
 			throw new Exception("estados não existem neste autômato");
 		if (semSimbolo)
 			throw new Exception("símbolo não faz parte do alfabeto");
-		this.regras.add(new RegraDeProducao(estadoDeOrigem, estadoDeDestino, novoSimbolo));
+		this.regras.add(new RegraDeProducao<T>(estadoDeOrigem, estadoDeDestino, novoSimbolo));
 	}
 	
 	public void executar(String cadeia) {
@@ -165,10 +165,10 @@ public class Automato {
 		boolean falha = false; //indica se o autômato leu um símbolo sem estado de destino
 		for (int j = 0; j < cadeia.length(); j++) {
 			char esteSimbolo = cadeia.charAt(j);
-			RegraDeProducao regraAtivada = new RegraDeProducao();
+			RegraDeProducao<T> regraAtivada = new RegraDeProducao<T>();
 			int regra = -1;
 			for (int i = 0; i < regras.size(); i++) {
-				if (regras.get(i).getEstadoOrigem() == estado && regras.get(i).getSimbolo() == esteSimbolo) {
+				if (regras.get(i).getEstadoOrigem() == estado && regras.get(i).getSimbolo().equals(esteSimbolo)) {
 					regra = i;
 				}
 			}
@@ -177,7 +177,7 @@ public class Automato {
 				estado = regraAtivada.getEstadoFim();
 				System.out.println(regraAtivada);
 			} else {
-				System.out.println("Entrada inválida: " + esteSimbolo + " no estado " + estado);
+				System.out.println("Entrada inválida: " + esteSimbolo + " no estado q" + estado);
 				falha = true;
 			}
 		}
@@ -209,7 +209,7 @@ public class Automato {
 					destinos[i] = false;
 				}
 				for (int iRegra = 0; iRegra < getRegras().size(); iRegra++) {
-					RegraDeProducao estaRegra = getRegras().get(iRegra);
+					RegraDeProducao<T> estaRegra = getRegras().get(iRegra);
 					if (estaRegra.getEstadoOrigem() == esteEstado && estaRegra.getSimbolo() == getAlfabeto().get(iSimb)) {
 						destinos[estaRegra.getEstadoFim()] = true;
 					}
@@ -262,15 +262,15 @@ public class Automato {
 				int qtARemover = 0;
 				for (int k = 0; k < getRegras().size(); k++) {
 					int esteEstado = getEstados().get(i);
-					char esteSimbolo = getAlfabeto().get(j);
-					RegraDeProducao estaRegra = getRegras().get(k);
+					T esteSimbolo = getAlfabeto().get(j);
+					RegraDeProducao<T> estaRegra = getRegras().get(k);
 					if (estaRegra.getEstadoOrigem() == esteEstado && estaRegra.getSimbolo() == esteSimbolo) {
 						aRemover[k] = true;
 						qtARemover++;
 					}
 				}
 				if (qtARemover > 1) {
-					ArrayList<RegraDeProducao> regrasARemover = new ArrayList<RegraDeProducao>();
+					ArrayList<RegraDeProducao<T>> regrasARemover = new ArrayList<RegraDeProducao<T>>();
 					for (int k = 0; k < getRegras().size(); k++) {
 						if (aRemover[k]) {
 							regrasARemover.add(getRegras().get(k));
@@ -287,7 +287,7 @@ public class Automato {
 					//de destinos que havia antes
 					getRegras().removeAll(regrasARemover);
 					int estadoDestinoDaNovaRegra = encontrarEstadoComplexo(componentesDoEstadoAReadicionar);
-					getRegras().add(new RegraDeProducao(getEstados().get(i), estadoDestinoDaNovaRegra, getAlfabeto().get(j)));
+					getRegras().add(new RegraDeProducao<T>(getEstados().get(i), estadoDestinoDaNovaRegra, getAlfabeto().get(j)));
 				}
 			}
 		}
@@ -364,19 +364,28 @@ public class Automato {
 	@Override
 	public String toString() {
 		String stringEstados = "";
-		for (int e : getEstados()) {
-			stringEstados += "q" + e + ", ";
+		if(getEstados().size() > 0) {
+			for (int e : getEstados()) {
+				stringEstados += "q" + e + ", ";
+			}
+			stringEstados = stringEstados.substring(0, stringEstados.length() - 2);
 		}
-		stringEstados = stringEstados.substring(0, stringEstados.length() - 2);
 		
 		String stringSimbolos = "";
-		for (char simbolo: getAlfabeto()) {
+		for (T simbolo: getAlfabeto()) {
 			stringSimbolos += simbolo + ", ";
 		}
 		stringSimbolos = stringSimbolos.substring(0, stringSimbolos.length() - 2);
 		
 		String listaFinais = "";
-		if (getEstadosFinais().size() > 0) {
+		int contagemEstadosFinais = 0;
+		for (boolean b : getEstadosFinais()) {
+			if (b) {
+				contagemEstadosFinais++;
+			}
+		}
+		if (contagemEstadosFinais > 0) {
+			System.out.println(getEstadosFinais().size());
 			for (int e = 0; e < getEstadosFinais().size(); e++) {
 				if(getEstadosFinais().get(e)) {
 					listaFinais += "q" + e + ", ";
@@ -389,18 +398,18 @@ public class Automato {
 			
 		String saida = "L = {{" + stringEstados + "}, {" + stringSimbolos + "}, δ, q" + getEstadoInicial() + ", {" + listaFinais + "}}";
 		String delta = "               δ |";
-		for (char simbolo : getAlfabeto()) {
+		for (T simbolo : getAlfabeto()) {
 			delta += "        " + simbolo + "         |";
 		}
 		for (int e : getEstados()) {
 			delta += "\n" + String.format("%16s", representar(e)) + " |";
-			for (char s : getAlfabeto()) {
+			for (T s : getAlfabeto()) {
 				boolean[] destinos = new boolean[getEstados().size()];
 				for (int i = 0; i <  destinos.length; i++) {
 					destinos[i] = false;
 				}
 				for (int iRegra = 0; iRegra < getRegras().size(); iRegra++) {
-					RegraDeProducao estaRegra = getRegras().get(iRegra);
+					RegraDeProducao<T> estaRegra = getRegras().get(iRegra);
 					if (estaRegra.getEstadoOrigem() == e && estaRegra.getSimbolo() == s) {
 						destinos[estaRegra.getEstadoFim()] = true;
 					}
