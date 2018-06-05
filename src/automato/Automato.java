@@ -155,7 +155,7 @@ public class Automato<T> {
 		if (estadoDeOrigem == -1 || estadoDeDestino == -1)
 			throw new Exception("estados não existem neste autômato");
 		if (semSimbolo)
-			throw new Exception("símbolo não faz parte do alfabeto");
+			throw new Exception("símbolo " + conteudo + " não faz parte do alfabeto");
 		this.regras.add(new RegraDeProducao<T>(estadoDeOrigem, estadoDeDestino, novoSimbolo));
 	}
 	
@@ -186,6 +186,48 @@ public class Automato<T> {
 			System.out.println(cadeia + " é uma cadeia reconhecida");
 		else
 			System.out.println(cadeia + " não é uma cadeia reconhecida");
+	}
+	
+	//igual a executar, mas retorna um ArrayList de tokens
+	public ArrayList<TokenClassificado> executarTokenizando(String cadeia) {
+		System.out.println("Testando e tokenizando cadeia " + cadeia + " com o autômato\n" + this.toString());
+		String tokenAtual = "";
+		ArrayList<TokenClassificado> resultado = new ArrayList<TokenClassificado>();
+		int estado = estadoInicial;
+		boolean falha = false; //indica se o autômato leu um símbolo sem estado de destino
+		for (int j = 0; j < cadeia.length(); j++) {
+			char esteSimbolo = cadeia.charAt(j);
+			RegraDeProducao<T> regraAtivada = new RegraDeProducao<T>();
+			int regra = -1;
+			for (int i = 0; i < regras.size(); i++) {
+				if (regras.get(i).getEstadoOrigem() == estado && regras.get(i).getSimbolo().equals(esteSimbolo)) {
+					regra = i;
+				}
+			}
+			if(regra >= 0) {
+				regraAtivada = regras.get(regra);
+				estado = regraAtivada.getEstadoFim();
+				System.out.println(regraAtivada);
+				tokenAtual += esteSimbolo;
+				
+				//se chegamos num estado final, q0 no analisador léxico de LMS, adicionar o token reconstruído
+				//atual à lista de tokens
+				if(getFinais().get(estado)) {
+					resultado.add(new TokenClassificado(tokenAtual, regraAtivada.getEstadoOrigem()));
+					tokenAtual = "";
+				}
+			} else {
+				System.out.println("Entrada inválida: " + esteSimbolo + " no estado q" + estado);
+				falha = true;
+			}
+		}
+		
+		if (!falha && getFinais().get(estado))
+			System.out.println(cadeia + " é uma cadeia reconhecida");
+		else
+			System.out.println(cadeia + " não é uma cadeia reconhecida");
+		
+		return resultado;
 	}
 	
 	public ArrayList<Boolean> getEstadosFinais() {
@@ -399,7 +441,12 @@ public class Automato<T> {
 		String saida = "L = {{" + stringEstados + "}, {" + stringSimbolos + "}, δ, q" + getEstadoInicial() + ", {" + listaFinais + "}}";
 		String delta = "               δ |";
 		for (T simbolo : getAlfabeto()) {
-			delta += "        " + simbolo + "         |";
+			String simboloNaColuna = " " + simbolo + " ";
+			if (simbolo.toString().equals("\t"))
+				simboloNaColuna = " \\t";
+			if (simbolo.toString().equals("\n"))
+				simboloNaColuna = " \\n";
+			delta += "       " + simboloNaColuna + "        |";
 		}
 		for (int e : getEstados()) {
 			delta += "\n" + String.format("%16s", representar(e)) + " |";

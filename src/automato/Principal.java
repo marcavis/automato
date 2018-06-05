@@ -1,6 +1,10 @@
 package automato;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
+
 
 public class Principal {
 	static char[] letras = new char[] {'a', 'b', 'c', 'd', 'e', 'f',
@@ -28,13 +32,21 @@ public class Principal {
 			simbolos.add(c);
 		}
 		simbolos.add(' ');
+		simbolos.add('\n');
+		simbolos.add('\t');
 		simbolos.add('(');
 		simbolos.add('*');
 		simbolos.add(')');
+		simbolos.add('[');
+		simbolos.add(']');
+		simbolos.add(':');
+		simbolos.add('=');
+		simbolos.add('"');
 		exemplo.setAlfabeto(simbolos);
 		
 		exemplo.criaEstadosIniciais(30);
 		exemplo.setEstadoInicial(0);
+		exemplo.setFinal(0, true);
 		try {
 			//estado 0 - pronto para um novo token
 			//estado 1 - no começo de um identificador
@@ -44,6 +56,7 @@ public class Principal {
 			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.DIGIT);
 			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.CHAR);
 			adicionaVariasRegras(exemplo, 1, 0, TokenLMS.ANYSPACE);
+			exemplo.adicionaRegra(1, 5, ':');
 			
 			adicionaVariasRegras(exemplo, 0, 2, TokenLMS.DIGIT);
 			adicionaVariasRegras(exemplo, 2, 2, TokenLMS.DIGIT);
@@ -56,24 +69,45 @@ public class Principal {
 			exemplo.adicionaRegra(15, 16, '*'); //estamos para sair de um comentário
 			exemplo.adicionaRegra(16, 16, '*'); //não faz mal ter uma sequência maior de asteriscos antes de fechar o comentário
 			exemplo.adicionaRegra(16, 17, ')'); //saímos
+			adicionaVariasRegras(exemplo, 17, 0, TokenLMS.ANYSPACE);
 			
-			//exemplo.setFinal(3, true);
+			exemplo.adicionaRegra(0, 8, '"');
+			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.DIGIT);
+			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.CHAR);
+			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.ANYSPACE);
+			exemplo.adicionaRegra(8, 0, '"');
+			
+			exemplo.adicionaRegra(0, 5, ':');
+			exemplo.adicionaRegra(5, 18, '='); //como trabalhar quando achamos um token mas não temos um espaço delimitador?
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		System.out.println(exemplo);
 		
-		//String programa = "43241.4";
-		String programa = "begin (* programa principal*)";
-//		readln(x,y);
-//		if x>1000 then x:= 1100
-//		else x::= y+100;
-//		while x>y do begin call p; readln(x,y) end;
-//		writeln(‘ tudo ok – boas férias ‘);
-//		end.\
-//		";
-		exemplo.executar(programa);
+		String programa = "";
+		try {
+			FileReader fr = new FileReader(new File("src/automato/programa.lms"));
+			BufferedReader br = new BufferedReader(fr);
+			String linha;
+			while((linha=br.readLine())!=null) {
+				programa += " " + linha;
+			}
+			br.close();
+			fr.close();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		ArrayList<TokenClassificado> listaDeTokens = exemplo.executarTokenizando(programa); 
+		System.out.println("\nTokens Encontrados\n");
+		for (TokenClassificado token : listaDeTokens) {
+			System.out.println(token.getToken() + "| do estado q" + token.getUltimoEstado());
+		}
 	}
 	
 	public static void adicionaVariasRegras(Automato<Character> automato, int origem, int dest, TokenLMS t) throws Exception {
@@ -87,6 +121,8 @@ public class Principal {
 			}
 		} else if (t == TokenLMS.ANYSPACE) {
 			automato.adicionaRegra(origem, dest, ' ');
+			automato.adicionaRegra(origem, dest, '\n');
+			automato.adicionaRegra(origem, dest, '\t');
 			System.out.println(automato.getRegras().size());
 		}
 	}
