@@ -3,5 +3,5 @@ readln(x,y);
 if x>1000 then x:= 1100
 else x:= y+100;
 while x>y do begin call p; readln(x,y) end;
-writeln(‘ tudo ok – boas férias ‘);
+writeln(" tudo ok – boas férias ");
 end.

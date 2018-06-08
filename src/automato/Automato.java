@@ -208,14 +208,16 @@ public class Automato<T> {
 				regraAtivada = regras.get(regra);
 				estado = regraAtivada.getEstadoFim();
 				System.out.println(regraAtivada);
+				if(regraAtivada.getEstadoFim() != regraAtivada.getEstadoOrigem() &&
+						!getFinais().get(regraAtivada.getEstadoOrigem())) {
+					resultado.add(new TokenClassificado(tokenAtual, regraAtivada.getEstadoOrigem()));
+					tokenAtual = "";
+				}
 				tokenAtual += esteSimbolo;
 				
 				//se chegamos num estado final, q0 no analisador léxico de LMS, adicionar o token reconstruído
 				//atual à lista de tokens
-				if(getFinais().get(estado)) {
-					resultado.add(new TokenClassificado(tokenAtual, regraAtivada.getEstadoOrigem()));
-					tokenAtual = "";
-				}
+				
 			} else {
 				System.out.println("Entrada inválida: " + escapar(esteSimbolo) + " no estado q" + estado);
 				falha = true;
