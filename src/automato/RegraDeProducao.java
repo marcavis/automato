@@ -44,9 +44,17 @@ public class RegraDeProducao<T> {
 		this.simbolo = simbolo;
 	}
 	
+	public String getSimboloEscapado() {
+		if (getSimbolo().toString().charAt(0) == '\t')
+			return "\\t";
+		if (getSimbolo().toString().charAt(0) == '\n')
+			return "\\n";
+		return getSimbolo().toString();
+	}
+	
 	@Override
 	public String toString() {
-		return "δ(q" + getEstadoOrigem() + ", " + getSimbolo() +
+		return "δ(q" + getEstadoOrigem() + ", " + getSimboloEscapado() +
 				") = q" + getEstadoFim();
 	}
 }

@@ -75,7 +75,6 @@ public class Automato<T> {
 					try {
 						novasRegras.add(new RegraDeProducao<T>(e, regra.getEstadoFim(), regra.getSimbolo()));
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -177,7 +176,7 @@ public class Automato<T> {
 				estado = regraAtivada.getEstadoFim();
 				System.out.println(regraAtivada);
 			} else {
-				System.out.println("Entrada inválida: " + esteSimbolo + " no estado q" + estado);
+				System.out.println("Entrada inválida: " + esteSimbolo + " no estado q" + estado );
 				falha = true;
 			}
 		}
@@ -191,6 +190,7 @@ public class Automato<T> {
 	//igual a executar, mas retorna um ArrayList de tokens
 	public ArrayList<TokenClassificado> executarTokenizando(String cadeia) {
 		System.out.println("Testando e tokenizando cadeia " + cadeia + " com o autômato\n" + this.toString());
+		int linha = 1;
 		String tokenAtual = "";
 		ArrayList<TokenClassificado> resultado = new ArrayList<TokenClassificado>();
 		int estado = estadoInicial;
@@ -217,17 +217,30 @@ public class Automato<T> {
 					tokenAtual = "";
 				}
 			} else {
-				System.out.println("Entrada inválida: " + esteSimbolo + " no estado q" + estado);
+				System.out.println("Entrada inválida: " + escapar(esteSimbolo) + " no estado q" + estado);
 				falha = true;
+			}
+			if (cadeia.charAt(j) == '\n') {
+				linha++;
+				System.out.println("linha: " + linha);
 			}
 		}
 		
+		System.out.println();
 		if (!falha && getFinais().get(estado))
 			System.out.println(cadeia + " é uma cadeia reconhecida");
 		else
 			System.out.println(cadeia + " não é uma cadeia reconhecida");
 		
 		return resultado;
+	}
+	
+	public String escapar (char c) {
+		if (c == '\n')
+			return "\\n";
+		if (c == '\t')
+			return "\\t";
+		return ""+c;
 	}
 	
 	public ArrayList<Boolean> getEstadosFinais() {
@@ -427,7 +440,7 @@ public class Automato<T> {
 			}
 		}
 		if (contagemEstadosFinais > 0) {
-			System.out.println(getEstadosFinais().size());
+			//System.out.println(getEstadosFinais().size());
 			for (int e = 0; e < getEstadosFinais().size(); e++) {
 				if(getEstadosFinais().get(e)) {
 					listaFinais += "q" + e + ", ";

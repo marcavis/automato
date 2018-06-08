@@ -37,6 +37,9 @@ public class Principal {
 		simbolos.add('(');
 		simbolos.add('*');
 		simbolos.add(')');
+		simbolos.add(',');
+		simbolos.add(';');
+		simbolos.add('.');
 		simbolos.add('[');
 		simbolos.add(']');
 		simbolos.add(':');
@@ -49,19 +52,23 @@ public class Principal {
 		exemplo.setFinal(0, true);
 		try {
 			//estado 0 - pronto para um novo token
-			//estado 1 - no começo de um identificador
-			//estado 2 - dentro de um identificador
+			//estado 1 - em um identificador
+			//estado 2 - em um número
+			//estado 3 - em um símbolo especial
 			
 			adicionaVariasRegras(exemplo, 0, 1, TokenLMS.CHAR); //adiciona todas as regras que vão do estado 0 a 1 com uma letra
 			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.DIGIT);
 			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.CHAR);
 			adicionaVariasRegras(exemplo, 1, 0, TokenLMS.ANYSPACE);
 			exemplo.adicionaRegra(1, 5, ':');
+			exemplo.adicionaRegra(1, 9, '('); //parênteses podem aparecer entre dois identificadores, sem problema
+			adicionaVariasRegras(exemplo, 9, 1, TokenLMS.CHAR);
 			
 			adicionaVariasRegras(exemplo, 0, 2, TokenLMS.DIGIT);
 			adicionaVariasRegras(exemplo, 2, 2, TokenLMS.DIGIT);
 			
 			exemplo.adicionaRegra(0, 9, '(');
+			adicionaVariasRegras(exemplo, 9, 0, TokenLMS.ANYSPACE);
 			exemplo.adicionaRegra(9, 15, '*'); //entramos num comentário
 			adicionaVariasRegras(exemplo, 15, 15, TokenLMS.DIGIT); //apenas asterisco começa a tirar do comentário
 			adicionaVariasRegras(exemplo, 15, 15, TokenLMS.CHAR); //ainda falta botar um adicionarVariasRegras pra caracteresEspeciais
@@ -76,6 +83,17 @@ public class Principal {
 			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.CHAR);
 			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.ANYSPACE);
 			exemplo.adicionaRegra(8, 0, '"');
+			
+			exemplo.adicionaRegra(0, 3, ')');
+			exemplo.adicionaRegra(0, 3, ',');
+			exemplo.adicionaRegra(0, 3, '[');
+			exemplo.adicionaRegra(0, 3, ';');
+			exemplo.adicionaRegra(0, 3, ']');
+			exemplo.adicionaRegra(1, 3, ')');
+			exemplo.adicionaRegra(1, 3, ',');
+			exemplo.adicionaRegra(1, 3, '[');
+			exemplo.adicionaRegra(1, 3, ';');
+			exemplo.adicionaRegra(1, 3, ']');
 			
 			exemplo.adicionaRegra(0, 5, ':');
 			exemplo.adicionaRegra(5, 18, '='); //como trabalhar quando achamos um token mas não temos um espaço delimitador?
@@ -93,7 +111,7 @@ public class Principal {
 			BufferedReader br = new BufferedReader(fr);
 			String linha;
 			while((linha=br.readLine())!=null) {
-				programa += " " + linha;
+				programa += linha + "\n";
 			}
 			br.close();
 			fr.close();
@@ -106,8 +124,16 @@ public class Principal {
 		ArrayList<TokenClassificado> listaDeTokens = exemplo.executarTokenizando(programa); 
 		System.out.println("\nTokens Encontrados\n");
 		for (TokenClassificado token : listaDeTokens) {
-			System.out.println(token.getToken() + "| do estado q" + token.getUltimoEstado());
+			System.out.println(token.getToken().trim() + "| do estado q" + token.getUltimoEstado());
 		}
+	}
+	
+	public static String tirarEspacos(String origem) {
+		String resultado = "";
+		for (char c : origem.toCharArray()) 
+			if(c != ' ' && c != '\n' && c != '\t')
+				resultado += c;
+		return resultado;
 	}
 	
 	public static void adicionaVariasRegras(Automato<Character> automato, int origem, int dest, TokenLMS t) throws Exception {
@@ -123,7 +149,7 @@ public class Principal {
 			automato.adicionaRegra(origem, dest, ' ');
 			automato.adicionaRegra(origem, dest, '\n');
 			automato.adicionaRegra(origem, dest, '\t');
-			System.out.println(automato.getRegras().size());
+			//System.out.println(automato.getRegras().size());
 		}
 	}
 	
