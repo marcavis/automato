@@ -196,7 +196,7 @@ public class Automato<T> {
 		int estado = estadoInicial;
 		boolean falha = false; //indica se o autômato leu um símbolo sem estado de destino
 		for (int j = 0; j < cadeia.length(); j++) {
-			char esteSimbolo = cadeia.charAt(j);
+			char esteSimbolo = Character.toLowerCase(cadeia.charAt(j));
 			RegraDeProducao<T> regraAtivada = new RegraDeProducao<T>();
 			int regra = -1;
 			for (int i = 0; i < regras.size(); i++) {
@@ -219,7 +219,7 @@ public class Automato<T> {
 				//atual à lista de tokens
 				
 			} else {
-				System.out.println("Entrada inválida: " + escapar(esteSimbolo) + " no estado q" + estado);
+				System.out.println("Linha " + linha + ": entrada inválida: " + escapar(esteSimbolo) + " no estado q" + estado);
 				falha = true;
 			}
 			if (cadeia.charAt(j) == '\n') {

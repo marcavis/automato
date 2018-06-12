@@ -62,36 +62,37 @@ public class Principal {
 			//estado 2 - em um número
 			//estado 3 - em um símbolo especial
 			
-			adicionaVariasRegras(exemplo, 0, 1, TokenLMS.CHAR); //adiciona todas as regras que vão do estado 0 a 1 com uma letra
-			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 1, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 1, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 0, 1, TokenLMS.CHAR); //adiciona todas as regras que vão do estado 0 a 1 com uma letra
+			adicionarVariasRegras(exemplo, 1, 1, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 1, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 1, 0, TokenLMS.ANYSPACE);
 			exemplo.adicionaRegra(1, 5, ':');
 			exemplo.adicionaRegra(1, 9, '('); //parênteses podem aparecer entre dois identificadores, sem problema
 
 			
-			adicionaVariasRegras(exemplo, 0, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 2, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 2, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 0, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 2, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 2, 0, TokenLMS.ANYSPACE);
 			
 			exemplo.adicionaRegra(0, 9, '(');
-			adicionaVariasRegras(exemplo, 9, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 9, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 9, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 9, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 9, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 9, 2, TokenLMS.DIGIT);
 			exemplo.adicionaRegra(9, 15, '*'); //entramos num comentário
-			adicionaVariasRegras(exemplo, 15, 15, TokenLMS.DIGIT); //apenas asterisco começa a tirar do comentário
-			adicionaVariasRegras(exemplo, 15, 15, TokenLMS.CHAR); //ainda falta botar um adicionarVariasRegras pra caracteresEspeciais
-			adicionaVariasRegras(exemplo, 15, 15, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 15, 15, TokenLMS.DIGIT); //apenas asterisco começa a tirar do comentário
+			adicionarVariasRegras(exemplo, 15, 15, TokenLMS.CHAR); //ainda falta botar um adicionarVariasRegras pra caracteresEspeciais
+			adicionarVariasRegras(exemplo, 15, 15, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 15, 15, TokenLMS.ANY_SYMBOL_NONASTERISK);
 			exemplo.adicionaRegra(15, 16, '*'); //estamos para sair de um comentário
 			exemplo.adicionaRegra(16, 16, '*'); //não faz mal ter uma sequência maior de asteriscos antes de fechar o comentário
 			exemplo.adicionaRegra(16, 17, ')'); //saímos
-			adicionaVariasRegras(exemplo, 17, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 17, 0, TokenLMS.ANYSPACE);
 			
 			exemplo.adicionaRegra(0, 8, '"');
-			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 8, 8, TokenLMS.ANY_SYMBOL_NONASTERISK);
+			adicionarVariasRegras(exemplo, 8, 8, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 8, 8, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 8, 8, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 8, 8, TokenLMS.ANY_SYMBOL_NONQUOTE);
 			exemplo.adicionaRegra(8, 14, '"');
 			exemplo.adicionaRegra(9, 8, '"');
 			exemplo.adicionaRegra(14, 3, ')');
@@ -122,16 +123,16 @@ public class Principal {
 			exemplo.adicionaRegra(3, 3, ']');
 
 			exemplo.adicionaRegra(3, 9, '(');
-			adicionaVariasRegras(exemplo, 3, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 3, 1, TokenLMS.CHAR); //podemos começar um novo identificador após um caractere especial
-			adicionaVariasRegras(exemplo, 3, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 3, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 3, 1, TokenLMS.CHAR); //podemos começar um novo identificador após um caractere especial
+			adicionarVariasRegras(exemplo, 3, 2, TokenLMS.DIGIT);
 			
 			exemplo.adicionaRegra(0, 5, ':');
 			exemplo.adicionaRegra(5, 18, '='); //como trabalhar quando achamos um token mas não temos um espaço delimitador?
 			
-			adicionaVariasRegras(exemplo, 18, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 18, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 18, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 18, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 18, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 18, 2, TokenLMS.DIGIT);
 			
 			//operadores
 			exemplo.adicionaRegra(0, 20, '+');
@@ -149,9 +150,9 @@ public class Principal {
 			exemplo.adicionaRegra(2, 20, '/');
 			exemplo.adicionaRegra(2, 20, '*');
 			exemplo.adicionaRegra(2, 20, '=');
-			adicionaVariasRegras(exemplo, 20, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 20, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 20, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 20, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 20, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 20, 2, TokenLMS.DIGIT);
 			
 			//operadores de potencialmente mais de um caracter
 			exemplo.adicionaRegra(0, 6, '<');
@@ -167,27 +168,27 @@ public class Principal {
 			exemplo.adicionaRegra(1, 7, '>');
 			exemplo.adicionaRegra(2, 7, '>');
 			exemplo.adicionaRegra(7, 13, '<');
-			adicionaVariasRegras(exemplo, 6, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 6, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 6, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 7, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 7, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 7, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 11, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 11, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 11, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 12, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 12, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 12, 2, TokenLMS.DIGIT);
-			adicionaVariasRegras(exemplo, 13, 0, TokenLMS.ANYSPACE);
-			adicionaVariasRegras(exemplo, 13, 1, TokenLMS.CHAR);
-			adicionaVariasRegras(exemplo, 13, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 6, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 6, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 6, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 7, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 7, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 7, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 11, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 11, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 11, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 12, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 12, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 12, 2, TokenLMS.DIGIT);
+			adicionarVariasRegras(exemplo, 13, 0, TokenLMS.ANYSPACE);
+			adicionarVariasRegras(exemplo, 13, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 13, 2, TokenLMS.DIGIT);
 			
 			//o que o ponto faz? hmm
 			exemplo.adicionaRegra(0, 4, '.');
 			exemplo.adicionaRegra(1, 4, '.');
 			exemplo.adicionaRegra(4, 10, '.');
-			
+			adicionarVariasRegras(exemplo, 4, 0, TokenLMS.ANYSPACE);
 			
 			
 		} catch (Exception e) {
@@ -227,7 +228,7 @@ public class Principal {
 		return resultado;
 	}
 	
-	public static void adicionaVariasRegras(Automato<Character> automato, int origem, int dest, TokenLMS t) throws Exception {
+	public static void adicionarVariasRegras(Automato<Character> automato, int origem, int dest, TokenLMS t) throws Exception {
 		if (t == TokenLMS.CHAR) {
 			for (char c : letras) {
 				automato.adicionaRegra(origem, dest, c);
@@ -244,11 +245,37 @@ public class Principal {
 		} else if (t == TokenLMS.ANY_SYMBOL_NONASTERISK) {
 			automato.adicionaRegra(origem, dest, '(');
 			automato.adicionaRegra(origem, dest, ')');
+			automato.adicionaRegra(origem, dest, '.');
+			automato.adicionaRegra(origem, dest, ':');
+			automato.adicionaRegra(origem, dest, '=');
+			automato.adicionaRegra(origem, dest, '+');
+			automato.adicionaRegra(origem, dest, '-');
+			automato.adicionaRegra(origem, dest, '/');
+			automato.adicionaRegra(origem, dest, '>');
+			automato.adicionaRegra(origem, dest, '<');
+			automato.adicionaRegra(origem, dest, '–');
 			automato.adicionaRegra(origem, dest, ',');
 			automato.adicionaRegra(origem, dest, ';');
 			automato.adicionaRegra(origem, dest, '[');
 			automato.adicionaRegra(origem, dest, ']');
-			//System.out.println(automato.getRegras().size());
+			automato.adicionaRegra(origem, dest, '"');
+		} else if (t == TokenLMS.ANY_SYMBOL_NONQUOTE) {
+			automato.adicionaRegra(origem, dest, '(');
+			automato.adicionaRegra(origem, dest, ')');
+			automato.adicionaRegra(origem, dest, '.');
+			automato.adicionaRegra(origem, dest, ':');
+			automato.adicionaRegra(origem, dest, '=');
+			automato.adicionaRegra(origem, dest, '+');
+			automato.adicionaRegra(origem, dest, '-');
+			automato.adicionaRegra(origem, dest, '/');
+			automato.adicionaRegra(origem, dest, '>');
+			automato.adicionaRegra(origem, dest, '<');
+			automato.adicionaRegra(origem, dest, '–');
+			automato.adicionaRegra(origem, dest, ',');
+			automato.adicionaRegra(origem, dest, ';');
+			automato.adicionaRegra(origem, dest, '[');
+			automato.adicionaRegra(origem, dest, ']');
+			automato.adicionaRegra(origem, dest, '*');
 		}
 	}
 	
