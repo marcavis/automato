@@ -53,7 +53,7 @@ public class Principal {
 		simbolos.add('–');
 		exemplo.setAlfabeto(simbolos);
 		
-		exemplo.criaEstadosIniciais(30);
+		exemplo.criaEstadosIniciais(21);
 		exemplo.setEstadoInicial(0);
 		exemplo.setFinal(0, true);
 		try {
@@ -164,9 +164,6 @@ public class Principal {
 			exemplo.adicionaRegra(1, 7, '>');
 			exemplo.adicionaRegra(2, 7, '>');
 			exemplo.adicionaRegra(7, 11, '=');
-			exemplo.adicionaRegra(0, 7, '>');
-			exemplo.adicionaRegra(1, 7, '>');
-			exemplo.adicionaRegra(2, 7, '>');
 			exemplo.adicionaRegra(7, 13, '<');
 			adicionarVariasRegras(exemplo, 6, 0, TokenLMS.ANYSPACE);
 			adicionarVariasRegras(exemplo, 6, 1, TokenLMS.CHAR);
@@ -195,8 +192,6 @@ public class Principal {
 			e.printStackTrace();
 		}
 		
-		System.out.println(exemplo);
-		
 		String programa = "";
 		try {
 			FileReader fr = new FileReader(new File("src/automato/programa.lms"));
@@ -216,8 +211,83 @@ public class Principal {
 		ArrayList<TokenClassificado> listaDeTokens = exemplo.executarTokenizando(programa); 
 		System.out.println("\nTokens Encontrados\n");
 		for (TokenClassificado token : listaDeTokens) {
-			System.out.println(token.getToken().trim() + "| do estado q" + token.getUltimoEstado());
+			System.out.println(String.format("%30s", token.getToken().trim()) + " | " + tipoDeToken(token));
 		}
+		System.out.println(exemplo.ehDeterministico());
+	}
+	
+	public static String tipoDeToken(TokenClassificado token) {
+		String tipo = "";
+		int estado = token.getUltimoEstado();
+		switch (estado) {
+			case 1:
+				//também pode ser palavra reservada
+				String[] reservadas = new String[] {"and", "begin",
+						"call", "case", "const", "do", "else", "end",
+						"for", "if", "integer", "not", "of", "or",
+						"procedure", "program", "readln", "repeat",
+						"then", "to", "until", "var", "while", "writeln"};
+				tipo = "identificador";
+				for (String string : reservadas) {
+					if (string.equals(token.getToken().trim())) {
+						tipo = "palavra reservada";
+					}
+				}
+				break;
+			case 2:
+				tipo = "número";
+				break;
+			case 3:
+				tipo = "símbolo especial";
+				break;
+			case 4:
+				tipo = "ponto final";
+				break;
+			case 5:
+				tipo = "dois pontos";
+				break;
+			case 6:
+				tipo = "sinal de menor";
+				break;
+			case 7:
+				tipo = "sinal de maior";
+				break;
+			case 8:
+				tipo = "início de literal";
+				break;
+			case 9:
+				tipo = "abre parênteses";
+				break;
+			case 11:
+				tipo = "sinais de menor-ou-igual ou maior-ou-igual";
+				break;
+			case 12:
+			case 13:
+				tipo = "sinal de diferença";
+				break;
+			case 14:
+				tipo = "fim de literal";
+				break;
+			case 15:
+				tipo = "começo de comentário";
+				break;
+			case 16:
+				tipo = "fim de comentário";
+				break;
+			case 17:
+				tipo = "fecha parênteses";
+				break;
+			case 18:
+				tipo = "sinal de atribuição";
+				break;
+			case 20:
+				tipo = "operador matemático";
+				break;
+			default:
+				tipo = "desconhecido";
+				break;
+		}
+		return tipo;
 	}
 	
 	public static String tirarEspacos(String origem) {

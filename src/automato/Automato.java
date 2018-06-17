@@ -207,7 +207,7 @@ public class Automato<T> {
 			if(regra >= 0) {
 				regraAtivada = regras.get(regra);
 				estado = regraAtivada.getEstadoFim();
-				System.out.println(regraAtivada);
+				//System.out.println(regraAtivada);
 				if(regraAtivada.getEstadoFim() != regraAtivada.getEstadoOrigem() &&
 						!getFinais().get(regraAtivada.getEstadoOrigem())) {
 					resultado.add(new TokenClassificado(tokenAtual, regraAtivada.getEstadoOrigem()));
@@ -219,7 +219,8 @@ public class Automato<T> {
 				//atual à lista de tokens
 				
 			} else {
-				System.out.println("Linha " + linha + ": entrada inválida: " + escapar(esteSimbolo) + " no estado q" + estado);
+				String tipoAteAqui = Principal.tipoDeToken(new TokenClassificado(tokenAtual, estado));
+				System.out.println("Linha " + linha + ": entrada inválida: " + escapar(esteSimbolo) + " encontrado durante a leitura de " + tipoAteAqui);
 				falha = true;
 			}
 			if (cadeia.charAt(j) == '\n') {
@@ -530,6 +531,7 @@ public class Automato<T> {
 			for (int j = i + 1; j < getRegras().size(); j++) {
 				if (getRegras().get(i).getEstadoOrigem() == getRegras().get(j).getEstadoOrigem() &&
 						getRegras().get(i).getSimbolo() == getRegras().get(j).getSimbolo()) {
+					System.out.println("asfasfas" + getRegras().get(i) + getRegras().get(j));
 					return false;
 				}
 			}
