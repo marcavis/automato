@@ -129,6 +129,8 @@ public class Principal {
 			
 			exemplo.adicionaRegra(0, 5, ':');
 			exemplo.adicionaRegra(5, 18, '='); //como trabalhar quando achamos um token mas não temos um espaço delimitador?
+			adicionarVariasRegras(exemplo, 5, 1, TokenLMS.CHAR);
+			adicionarVariasRegras(exemplo, 5, 0, TokenLMS.ANYSPACE);
 			
 			adicionarVariasRegras(exemplo, 18, 0, TokenLMS.ANYSPACE);
 			adicionarVariasRegras(exemplo, 18, 1, TokenLMS.CHAR);
@@ -194,7 +196,7 @@ public class Principal {
 		
 		String programa = "";
 		try {
-			FileReader fr = new FileReader(new File("src/automato/programa.lms"));
+			FileReader fr = new FileReader(new File("src/automato/programa2.lms"));
 			BufferedReader br = new BufferedReader(fr);
 			String linha;
 			while((linha=br.readLine())!=null) {
@@ -213,7 +215,6 @@ public class Principal {
 		for (TokenClassificado token : listaDeTokens) {
 			System.out.println(String.format("%30s", token.getToken().trim()) + " | " + tipoDeToken(token));
 		}
-		System.out.println(exemplo.ehDeterministico());
 	}
 	
 	public static String tipoDeToken(TokenClassificado token) {
@@ -227,64 +228,64 @@ public class Principal {
 						"for", "if", "integer", "not", "of", "or",
 						"procedure", "program", "readln", "repeat",
 						"then", "to", "until", "var", "while", "writeln"};
-				tipo = "identificador";
+				tipo = "1 - identificador";
 				for (String string : reservadas) {
 					if (string.equals(token.getToken().trim())) {
-						tipo = "palavra reservada";
+						tipo = "21 - palavra reservada";
 					}
 				}
 				break;
 			case 2:
-				tipo = "número";
+				tipo = "2 - número";
 				break;
 			case 3:
-				tipo = "símbolo especial";
+				tipo = "3 - símbolo especial";
 				break;
 			case 4:
-				tipo = "ponto final";
+				tipo = "4 - ponto final";
 				break;
 			case 5:
-				tipo = "dois pontos";
+				tipo = "5 - dois pontos";
 				break;
 			case 6:
-				tipo = "sinal de menor";
+				tipo = "6 - sinal de menor";
 				break;
 			case 7:
-				tipo = "sinal de maior";
+				tipo = "7 - sinal de maior";
 				break;
 			case 8:
-				tipo = "início de literal";
+				tipo = "8 - início de literal";
 				break;
 			case 9:
-				tipo = "abre parênteses";
+				tipo = "9 - abre parênteses";
 				break;
 			case 11:
-				tipo = "sinais de menor-ou-igual ou maior-ou-igual";
+				tipo = "11 - sinais de menor-ou-igual ou maior-ou-igual";
 				break;
 			case 12:
 			case 13:
-				tipo = "sinal de diferença";
+				tipo = "13 - sinal de diferença";
 				break;
 			case 14:
-				tipo = "fim de literal";
+				tipo = "14 - fim de literal";
 				break;
 			case 15:
-				tipo = "começo de comentário";
+				tipo = "15 - começo de comentário";
 				break;
 			case 16:
-				tipo = "fim de comentário";
+				tipo = "16 - fim de comentário";
 				break;
 			case 17:
-				tipo = "fecha parênteses";
+				tipo = "17 - fecha parênteses";
 				break;
 			case 18:
-				tipo = "sinal de atribuição";
+				tipo = "18 - sinal de atribuição";
 				break;
 			case 20:
-				tipo = "operador matemático";
+				tipo = "20 - operador matemático";
 				break;
 			default:
-				tipo = "desconhecido";
+				tipo = "22 - desconhecido";
 				break;
 		}
 		return tipo;

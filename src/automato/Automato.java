@@ -222,6 +222,7 @@ public class Automato<T> {
 				String tipoAteAqui = Principal.tipoDeToken(new TokenClassificado(tokenAtual, estado));
 				System.out.println("Linha " + linha + ": entrada inválida: " + escapar(esteSimbolo) + " encontrado durante a leitura de " + tipoAteAqui);
 				falha = true;
+				break;
 			}
 			if (cadeia.charAt(j) == '\n') {
 				linha++;
