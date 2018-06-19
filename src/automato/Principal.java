@@ -267,6 +267,9 @@ public class Principal {
 				break;
 			case 8:
 				tipo = "8 - início de literal";
+				if (token.getToken().length() > 255) {
+					throw new Exception("Erro: literal (" + token.getToken() + ") tem mais de 255 caracteres.");
+				}
 				break;
 			case 9:
 				tipo = "9 - abre parênteses";
