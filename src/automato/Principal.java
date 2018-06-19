@@ -196,7 +196,7 @@ public class Principal {
 		
 		String programa = "";
 		try {
-			FileReader fr = new FileReader(new File("src/automato/programa2.lms"));
+			FileReader fr = new FileReader(new File("src/automato/programa.lms"));
 			BufferedReader br = new BufferedReader(fr);
 			String linha;
 			while((linha=br.readLine())!=null) {
@@ -213,11 +213,16 @@ public class Principal {
 		ArrayList<TokenClassificado> listaDeTokens = exemplo.executarTokenizando(programa); 
 		System.out.println("\nTokens Encontrados\n");
 		for (TokenClassificado token : listaDeTokens) {
-			System.out.println(String.format("%30s", token.getToken().trim()) + " | " + tipoDeToken(token));
+			try {
+				System.out.println(String.format("%30s", token.getToken().trim()) + " | " + tipoDeToken(token));
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				break;
+			}
 		}
 	}
 	
-	public static String tipoDeToken(TokenClassificado token) {
+	public static String tipoDeToken(TokenClassificado token) throws Exception {
 		String tipo = "";
 		int estado = token.getUltimoEstado();
 		switch (estado) {
@@ -234,9 +239,16 @@ public class Principal {
 						tipo = "21 - palavra reservada";
 					}
 				}
+				if (token.getToken().trim().length() > 32) {
+					throw new Exception("Erro: " + tipo + "(" + token.getToken() + ") tem mais de 32 caracteres.");
+				}
 				break;
 			case 2:
 				tipo = "2 - número";
+				int valor = Integer.parseInt(token.getToken().trim());
+				if (valor > 32767) {
+					throw new Exception ("Erro: valor " + valor + " é maior que 32767 ou menor que -32767.");
+				}
 				break;
 			case 3:
 				tipo = "3 - símbolo especial";

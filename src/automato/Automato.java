@@ -219,7 +219,12 @@ public class Automato<T> {
 				//atual à lista de tokens
 				
 			} else {
-				String tipoAteAqui = Principal.tipoDeToken(new TokenClassificado(tokenAtual, estado));
+				String tipoAteAqui = "";
+				try {
+					tipoAteAqui = Principal.tipoDeToken(new TokenClassificado(tokenAtual, estado));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				System.out.println("Linha " + linha + ": entrada inválida: " + escapar(esteSimbolo) + " encontrado durante a leitura de " + tipoAteAqui);
 				falha = true;
 				break;
