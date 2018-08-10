@@ -193,7 +193,7 @@ public class Principal {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		//
 		String programa = "";
 		try {
 			FileReader fr = new FileReader(new File("src/automato/programa.lms"));
